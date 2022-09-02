@@ -10,3 +10,4 @@ stmol==0.0.7
 streamlit==1.8.0
 padelpy==0.1.11
 Pillow==8.0.1
+ipython==8.4.0
