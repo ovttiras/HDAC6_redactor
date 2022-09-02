@@ -19,6 +19,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn import metrics
 from sklearn.metrics import pairwise_distances
 import joblib
+from IPython.display import HTML
 from stmol import showmol
 import py3Dmol
 from molvs import standardize_smiles
