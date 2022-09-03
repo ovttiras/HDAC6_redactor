@@ -536,6 +536,7 @@ if models_option == 'RF_Padel':
             records_ts = []
             records_ts.append(smiles)
             df_ts = pd.DataFrame(records_ts, columns=["Smiles"])
+            file_smiles=df_ts.to_csv
             
             # df_ts.to_csv('datasets/molecule_ts.smi', sep=',', index=False, header=False)
             load_model_RF = pickle.load(open('Padels/HDAC6_RF_padels.pkl', 'rb'))
@@ -559,7 +560,7 @@ if models_option == 'RF_Padel':
             fingerprint_descriptortypes = fp[fingerprint]
             
             
-            padeldescriptor(mol_dir=df_ts.to_csv, 
+            padeldescriptor(mol_dir=file_smiles, 
                 d_file="Padels/KlekotaRoth.csv",
                 descriptortypes= fingerprint_descriptortypes,
                 detectaromaticity=True,
