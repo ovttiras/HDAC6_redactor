@@ -33,8 +33,6 @@ from rdkit.Chem.Draw import rdDepictor
 rdDepictor.SetPreferCoordGen(True)
 import streamlit.components.v1 as components
 import jdk
-jdk.install('11', jre=True)
-
 
 ######################
 # Page Title
