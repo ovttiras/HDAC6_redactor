@@ -25,12 +25,15 @@ import py3Dmol
 from molvs import standardize_smiles
 from padelpy import padeldescriptor
 from padelpy import from_sdf
-from io import BytesIO
+from io import StringIO
+import io
 from functools import partial
 from PIL import Image
 from rdkit.Chem.Draw import rdDepictor
 rdDepictor.SetPreferCoordGen(True)
 import streamlit.components.v1 as components
+import jdk
+jdk.install('11', jre=True)
 
 
 ######################
@@ -508,121 +511,121 @@ if models_option == 'RF_Padel':
 
        
 
-    DRAW = st.checkbox('Draw molecule')
-    if DRAW:
-        _RELEASE = False    
-        if not _RELEASE:
-            _component_func = components.declare_component(
-                    "chemstreamlit",
-                    url="http://localhost:3001"
-                    )
+    # DRAW = st.checkbox('Draw molecule')
+    # if DRAW:
+    #     _RELEASE = False    
+    #     if not _RELEASE:
+    #         _component_func = components.declare_component(
+    #                 "chemstreamlit",
+    #                 url="http://localhost:3001"
+    #                 )
             
-        else:
-            parent_dir = os.path.dirname(os.path.abspath(__file__))
-            build_dir = os.path.join(parent_dir, "frontend/build")
-            _component_func = components.declare_component("my_component", path=build_dir)
+    #     else:
+    #         parent_dir = os.path.dirname(os.path.abspath(__file__))
+    #         build_dir = os.path.join(parent_dir, "frontend/build")
+    #         _component_func = components.declare_component("my_component", path=build_dir)
         
-        def my_component():
-            component_value = _component_func()
-            return component_value
+    #     def my_component():
+    #         component_value = _component_func()
+    #         return component_value
         
-        res = my_component()
+    #     res = my_component()
         
-        compound_smiles = res
-        if st.button('PREDICT'):
-            smiles=standardize_smiles(compound_smiles)
+    #     compound_smiles = res
+    #     if st.button('PREDICT'):
+    #         smiles=standardize_smiles(compound_smiles)
                 
-                # Calculate molecular descriptors
-            records_ts = []
-            records_ts.append(smiles)
-            df_ts = pd.DataFrame(records_ts, columns=["Smiles"])
-            file_smiles=df_ts.to_csv
+    #             # Calculate molecular descriptors
+    #         records_ts = []
+    #         records_ts.append(smiles)
+    #         df_ts = pd.DataFrame(records_ts, columns=["Smiles"])
+    #         file_smiles=df_ts.to_csv
             
-            # df_ts.to_csv('datasets/molecule_ts.smi', sep=',', index=False, header=False)
-            load_model_RF = pickle.load(open('Padels/HDAC6_RF_padels.pkl', 'rb'))
-            import glob
-            xml_files = glob.glob("fingerprints_xml/*.xml")
-            FP_list = ['AtomPairs2DCount',
-        'AtomPairs2D',
-        'EState',
-        'CDKextended',
-        'CDK',
-        'CDKgraphonly',
-        'KlekotaRothCount',
-        'KlekotaRoth',
-        'MACCS',
-        'PubChem',
-        'SubstructureCount',
-        'Substructure']
-            fp = dict(zip(FP_list, xml_files))
-            fingerprint = 'KlekotaRoth'
-            # fingerprint_output_file = ''.join([fingerprint,'.csv'])
-            fingerprint_descriptortypes = fp[fingerprint]
+    #         # df_ts.to_csv('datasets/molecule_ts.smi', sep=',', index=False, header=False)
+    #         load_model_RF = pickle.load(open('Padels/HDAC6_RF_padels.pkl', 'rb'))
+    #         import glob
+    #         xml_files = glob.glob("fingerprints_xml/*.xml")
+    #         FP_list = ['AtomPairs2DCount',
+    #     'AtomPairs2D',
+    #     'EState',
+    #     'CDKextended',
+    #     'CDK',
+    #     'CDKgraphonly',
+    #     'KlekotaRothCount',
+    #     'KlekotaRoth',
+    #     'MACCS',
+    #     'PubChem',
+    #     'SubstructureCount',
+    #     'Substructure']
+    #         fp = dict(zip(FP_list, xml_files))
+    #         fingerprint = 'KlekotaRoth'
+    #         # fingerprint_output_file = ''.join([fingerprint,'.csv'])
+    #         fingerprint_descriptortypes = fp[fingerprint]
             
             
-            padeldescriptor(mol_dir=file_smiles, 
-                d_file="Padels/KlekotaRoth.csv",
-                descriptortypes= fingerprint_descriptortypes,
-                detectaromaticity=True,
-                standardizenitro=True,
-                standardizetautomers=True,
-                threads=2,
-                removesalt=True,
-                log=False,
-                fingerprints=True)
+    #         padeldescriptor(mol_dir=file_smiles, 
+    #             d_file="Padels/KlekotaRoth.csv",
+    #             descriptortypes= fingerprint_descriptortypes,
+    #             detectaromaticity=True,
+    #             standardizenitro=True,
+    #             standardizetautomers=True,
+    #             threads=2,
+    #             removesalt=True,
+    #             log=False,
+    #             fingerprints=True)
             
-            descriptors_kr = pd.read_csv('Padels/KlekotaRoth.csv')
-            x_ts = descriptors_kr.drop('Name', axis=1)
+    #         descriptors_kr = pd.read_csv('Padels/KlekotaRoth.csv')
+    #         x_ts = descriptors_kr.drop('Name', axis=1)
 
-            X = np.asarray(x_ts)
+    #         X = np.asarray(x_ts)
             
-            ######################
-            # Pre-built model
-            ######################
+    #         ######################
+    #         # Pre-built model
+    #         ######################
 
             
-            # Apply model to make predictions
-            prediction_RF = load_model_RF.predict(X)
-            prediction_RF = np.where(prediction_RF == 1, "Active", "Inactive")
+    #         # Apply model to make predictions
+    #         prediction_RF = load_model_RF.predict(X)
+    #         prediction_RF = np.where(prediction_RF == 1, "Active", "Inactive")
 
 
-            # Estimination AD
-            mol = Chem.MolFromSmiles(smiles)
-            mg = AllChem.GetMorganFingerprintAsBitVect(mol, 2, useFeatures=True)
+    #         # Estimination AD
+    #         mol = Chem.MolFromSmiles(smiles)
+    #         mg = AllChem.GetMorganFingerprintAsBitVect(mol, 2, useFeatures=True)
 
-            d = {}
-            for m in Chem.SDMolSupplier('datasets/HDAC6_ws.sdf'):
-                if m is not None:
-                    mg_ = AllChem.GetMorganFingerprintAsBitVect(m, 2, useFeatures=True)
-                    d.setdefault(Chem.MolToSmiles(m),[]).append(DataStructs.FingerprintSimilarity(mg, mg_))
-            df_ECFP4 = pd.DataFrame.from_dict(d).T
-            if df_ECFP4[0].max()>=threshold:
-                cpd_AD_vs = "Inside AD"
-            else:
-                cpd_AD_vs = "Outside AD"
+    #         d = {}
+    #         for m in Chem.SDMolSupplier('datasets/HDAC6_ws.sdf'):
+    #             if m is not None:
+    #                 mg_ = AllChem.GetMorganFingerprintAsBitVect(m, 2, useFeatures=True)
+    #                 d.setdefault(Chem.MolToSmiles(m),[]).append(DataStructs.FingerprintSimilarity(mg, mg_))
+    #         df_ECFP4 = pd.DataFrame.from_dict(d).T
+    #         if df_ECFP4[0].max()>=threshold:
+    #             cpd_AD_vs = "Inside AD"
+    #         else:
+    #             cpd_AD_vs = "Outside AD"
             
-            st.header('**Prediction results:**')
-            st.write('**HDAC6**: ', prediction_RF[0])
-            st.write('**Applicability domain (AD)**: ', cpd_AD_vs)
-            # 3D structure
-            st.header('**3D structure of the studied compound:**')
-            def makeblock(smi):
-                mol = Chem.MolFromSmiles(smi)
-                mol = Chem.AddHs(mol)
-                AllChem.EmbedMolecule(mol)
-                mblock = Chem.MolToMolBlock(mol)
-                return mblock
+    #         st.header('**Prediction results:**')
+    #         st.write('**HDAC6**: ', prediction_RF[0])
+    #         st.write('**Applicability domain (AD)**: ', cpd_AD_vs)
+    #         # 3D structure
+    #         st.header('**3D structure of the studied compound:**')
+    #         def makeblock(smi):
+    #             mol = Chem.MolFromSmiles(smi)
+    #             mol = Chem.AddHs(mol)
+    #             AllChem.EmbedMolecule(mol)
+    #             mblock = Chem.MolToMolBlock(mol)
+    #             return mblock
 
-            def render_mol(xyz):
-                xyzview = py3Dmol.view()#(width=400,height=400)
-                xyzview.addModel(xyz,'mol')
-                xyzview.setStyle({'stick':{}})
-                xyzview.setBackgroundColor('black')
-                xyzview.zoomTo()
-                showmol(xyzview,height=500,width=500)
-            blk=makeblock(compound_smiles)
-            render_mol(blk)
-            st.write('You can use the scroll wheel on your mouse to zoom in or out a 3D structure of compound')
+    #         def render_mol(xyz):
+    #             xyzview = py3Dmol.view()#(width=400,height=400)
+    #             xyzview.addModel(xyz,'mol')
+    #             xyzview.setStyle({'stick':{}})
+    #             xyzview.setBackgroundColor('black')
+    #             xyzview.zoomTo()
+    #             showmol(xyzview,height=500,width=500)
+    #         blk=makeblock(compound_smiles)
+    #         render_mol(blk)
+    #         st.write('You can use the scroll wheel on your mouse to zoom in or out a 3D structure of compound')
 
     
     SMILES = st.checkbox('SMILES notations (*.smi)')
@@ -641,7 +644,10 @@ if models_option == 'RF_Padel':
             records_ts = []
             records_ts.append(smiles)
             df_ts = pd.DataFrame(records_ts, columns=["Smiles"])
-            df_ts.to_csv('datasets/molecule_ts.smi', sep=',', index=False, header=False)
+            s = StringIO()
+            df_ts.to_csv(s, header=False)
+            my_csv = s.getvalue()
+            # smi=df_ts.to_csv('datasets/molecule_ts.smi', sep=',', index=False, header=False)
             load_model_RF = pickle.load(open('Padels/HDAC6_RF_padels.pkl', 'rb'))
             import glob
             xml_files = glob.glob("fingerprints_xml/*.xml")
@@ -663,7 +669,7 @@ if models_option == 'RF_Padel':
             fingerprint_descriptortypes = fp[fingerprint]
             
             
-            padeldescriptor(mol_dir='datasets/molecule_ts.smi', 
+            padeldescriptor(mol_dir=my_csv, 
                 d_file="Padels/KlekotaRoth.csv",
                 descriptortypes= fingerprint_descriptortypes,
                 detectaromaticity=True,
