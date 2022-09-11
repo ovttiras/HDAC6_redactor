@@ -642,7 +642,9 @@ if models_option == 'RF_Padel':
             records_ts = []
             records_ts.append(smiles)
             df_ts = pd.DataFrame(records_ts, columns=["Smiles"])
-            smi=df_ts.to_csv('datasets/molecule_ts.smi', sep=',', index=False, header=False)
+            s = StringIO()
+            df_ts.to_csv(s, header=False)
+            my_csv = s.getvalue()
             load_model_RF = pickle.load(open('Padels/HDAC6_RF_padels.pkl', 'rb'))
             import glob
             xml_files = glob.glob("fingerprints_xml/*.xml")
@@ -660,11 +662,11 @@ if models_option == 'RF_Padel':
         'Substructure']
             fp = dict(zip(FP_list, xml_files))
             fingerprint = 'KlekotaRoth'
-            fingerprint_output_file = ''.join([fingerprint,'.csv'])
+            # fingerprint_output_file = ''.join([fingerprint,'.csv'])
             fingerprint_descriptortypes = fp[fingerprint]
             
             
-            padeldescriptor(mol_dir='datasets/molecule_ts.smi', 
+            padeldescriptor(mol_dir=my_csv, 
                 d_file="Padels/KlekotaRoth.csv",
                 descriptortypes= fingerprint_descriptortypes,
                 detectaromaticity=True,
