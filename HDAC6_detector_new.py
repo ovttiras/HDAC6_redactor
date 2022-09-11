@@ -660,7 +660,7 @@ if models_option == 'RF_Padel':
         'Substructure']
             fp = dict(zip(FP_list, xml_files))
             fingerprint = 'KlekotaRoth'
-            # fingerprint_output_file = ''.join([fingerprint,'.csv'])
+            fingerprint_output_file = ''.join([fingerprint,'.csv'])
             fingerprint_descriptortypes = fp[fingerprint]
             
             
