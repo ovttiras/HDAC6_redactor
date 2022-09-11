@@ -32,7 +32,7 @@ from PIL import Image
 from rdkit.Chem.Draw import rdDepictor
 rdDepictor.SetPreferCoordGen(True)
 import streamlit.components.v1 as components
-import jdk
+# import jdk
 
 ######################
 # Page Title
@@ -642,10 +642,7 @@ if models_option == 'RF_Padel':
             records_ts = []
             records_ts.append(smiles)
             df_ts = pd.DataFrame(records_ts, columns=["Smiles"])
-            s = StringIO()
-            df_ts.to_csv(s, header=False)
-            my_csv = s.getvalue()
-            # smi=df_ts.to_csv('datasets/molecule_ts.smi', sep=',', index=False, header=False)
+            smi=df_ts.to_csv('datasets/molecule_ts.smi', sep=',', index=False, header=False)
             load_model_RF = pickle.load(open('Padels/HDAC6_RF_padels.pkl', 'rb'))
             import glob
             xml_files = glob.glob("fingerprints_xml/*.xml")
@@ -667,7 +664,7 @@ if models_option == 'RF_Padel':
             fingerprint_descriptortypes = fp[fingerprint]
             
             
-            padeldescriptor(mol_dir=my_csv, 
+            padeldescriptor(mol_dir='datasets/molecule_ts.smi', 
                 d_file="Padels/KlekotaRoth.csv",
                 descriptortypes= fingerprint_descriptortypes,
                 detectaromaticity=True,
