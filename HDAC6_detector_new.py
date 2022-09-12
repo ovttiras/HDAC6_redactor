@@ -663,11 +663,12 @@ if models_option == 'RF_Padel':
             fp = dict(zip(FP_list, xml_files))
             fingerprint = 'KlekotaRoth'
             # fingerprint_output_file = ''.join([fingerprint,'.csv'])
+            fingerprint_output_file="Padels/KlekotaRoth.csv"
             fingerprint_descriptortypes = fp[fingerprint]
             
             
             padeldescriptor(mol_dir=my_csv, 
-                d_file="Padels/KlekotaRoth.csv",
+                d_file=fingerprint_output_file,
                 descriptortypes= fingerprint_descriptortypes,
                 detectaromaticity=True,
                 standardizenitro=True,
@@ -677,7 +678,7 @@ if models_option == 'RF_Padel':
                 log=False,
                 fingerprints=True)
             
-            descriptors_kr = pd.read_csv('Padels/KlekotaRoth.csv')
+            descriptors_kr = fingerprint_output_file
             x_ts = descriptors_kr.drop('Name', axis=1)
 
             X = np.asarray(x_ts)
