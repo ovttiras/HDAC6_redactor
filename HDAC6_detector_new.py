@@ -643,7 +643,7 @@ if models_option == 'RF_Padel':
             records_ts.append(smiles)
             df_ts = pd.DataFrame(records_ts, columns=["Smiles"])
             s = StringIO()
-            df_ts.to_csv(s, header=False)
+            df_ts.to_csv(s, index=False,header=False)
             my_csv = s.getvalue()
             load_model_RF = pickle.load(open('Padels/HDAC6_RF_padels.pkl', 'rb'))
             import glob
